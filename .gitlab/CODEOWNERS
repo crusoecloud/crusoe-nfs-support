@@ -1,0 +1,11 @@
+# default = everyone is codeowner
+* @crusoeenergy/island
+
+# more restrictive ownership for managing this file, adding dependencies, and changing ci/build
+.gitlab/CODEOWNERS @lanwall12 @nitper @crusoeenergy/island/storage-oncall
+.gitlab-ci.yml     @lanwall12 @nitper @crusoeenergy/island/storage-oncall
+.golangci-lint.yml @lanwall12 @nitper @crusoeenergy/island/storage-oncall
+Makefile           @lanwall12 @nitper @crusoeenergy/island/storage-oncall
+Dockerfile         @lanwall12 @nitper @crusoeenergy/island/storage-oncall
+Dockerfile.*       @lanwall12 @nitper @crusoeenergy/island/storage-oncall
+charts/            @lanwall12 @nitper @crusoeenergy/island/storage-oncall
