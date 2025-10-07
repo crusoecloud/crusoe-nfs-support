@@ -23,7 +23,7 @@ echo "ubuntu@1.2.3.4" >> hosts.txt
 echo "ubuntu@1.2.3.5" >> hosts.txt
 ```
 
-3. Use pscp and pssh to apply the script to multiple files at once:
+3. Use pscp and pssh to apply the script to multiple files at once. Note that the setup script can take a long time (more than a few minutes).
 
 ```
 pscp -h hosts.txt install.py /home/ubuntu/crusoe_shared_disks_nfs_setup.py
