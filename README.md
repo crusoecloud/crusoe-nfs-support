@@ -63,7 +63,7 @@ echo "ubuntu@1.2.3.4" >> hosts.txt
 echo "ubuntu@1.2.3.5" >> hosts.txt
 ```
 
-4. Use pscp and pssh to apply the script to multiple files at once. Note that the setup script can take a long time (more than a few minutes).
+4. Use pscp and pssh to apply the script to multiple files at once. Please replace `<PASTE_DISK_TEXT_HERE>` with the data found in step (2). Note that the setup script can take a long time (more than a few minutes).
 
 ```
 pscp -h hosts.txt crusoe_shared_disks_virtiofs_to_nfs.py /home/ubuntu/crusoe_shared_disks_virtiofs_to_nfs.py
