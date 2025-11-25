@@ -23,11 +23,18 @@ echo "ubuntu@1.2.3.4" >> hosts.txt
 echo "ubuntu@1.2.3.5" >> hosts.txt
 ```
 
-3. Use pscp and pssh to apply the script to multiple files at once. Note that the setup script can take a long time (more than a few minutes).
+3a. Use pscp and pssh to apply the script to multiple files at once. Note that the setup script can take a long time (more than a few minutes).
 
 ```
 pscp -h hosts.txt crusoe_shared_disks_nfs_setup.py /home/ubuntu/crusoe_shared_disks_nfs_setup.py
 pssh -t 0 -h hosts.txt "export DEBIAN_FRONTEND=noninteractive && python3 /home/ubuntu/crusoe_shared_disks_nfs_setup.py -y"
+```
+
+3b. By default, the read-ahead cache optimizations and network optimizations are turned off. This can be switched on using a command like so:
+
+```
+pscp -h hosts.txt crusoe_shared_disks_nfs_setup.py /home/ubuntu/crusoe_shared_disks_nfs_setup.py
+pssh -t 0 -h hosts.txt "export DEBIAN_FRONTEND=noninteractive && python3 /home/ubuntu/crusoe_shared_disks_nfs_setup.py -y --apply-read-ahead-cache --apply-network-optimizations"
 ```
 
 ## How to remount Virtiofs to NFS for Crusoe Shared Disks
