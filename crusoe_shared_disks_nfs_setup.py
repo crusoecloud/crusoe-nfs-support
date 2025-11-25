@@ -92,6 +92,8 @@ def install_VAST_NFS_driver(auto_confirm = False):
 def update_read_ahead_cache(auto_confirm = False):
     """
     check all existing NFS mounts, and update the read-ahead cache.
+    this is excluded by default.
+
     add the udev rule to auto-apply the read-ahead cache
     """
     out, err = run_command("ls /etc/udev/rules.d/99-nfs.rules")
@@ -128,7 +130,9 @@ def optimize_network_interface(auto_confirm = False):
     """
     optimizes the VM's network interface settings
     for high shared disk performance.
-    add a systemctl service to auto-apply the following settings on restart:
+    this is excluded by default.
+    
+    adds a systemctl service to auto-apply the following settings on restart:
     - MTU of 9000,
     - ring buffer set to 8192
     """
@@ -185,20 +189,24 @@ def optimize_network_interface(auto_confirm = False):
         return
     
     print("Optimized network interface settings successfully.")
-def check_args_y():
-    parser = argparse.ArgumentParser(description="A script that checks for a -y flag.")
+def check_args():
+    parser = argparse.ArgumentParser(description="A script that checks for various installation options.")
     parser.add_argument('-y', action='store_true', help="A flag to confirm an action.")
+    parser.add_argument('--apply-read-ahead-cache', action='store_true', help="A flag to auto-apply readahead cache options.")
+    parser.add_argument('--apply-network-optimizations', action='store_true', help="A flag to auto-apply network optimization options.")
 
     args = parser.parse_args()
 
-    return args.y
+    return args.y, args.apply_read_ahead_cache, args.apply_network_optimizations
 def do_main():
-    auto_confirm = check_args_y()
+    auto_confirm, apply_read_ahead_cache, apply_network_optimizations = check_args()
     success = install_VAST_NFS_driver(auto_confirm)
     
     if success:
-        update_read_ahead_cache(auto_confirm)
-        optimize_network_interface(auto_confirm)
+        if apply_read_ahead_cache:
+            update_read_ahead_cache(auto_confirm)
+        if apply_network_optimizations:
+            optimize_network_interface(auto_confirm)
     else:
         sys.exit(1)
 if __name__ == "__main__":
