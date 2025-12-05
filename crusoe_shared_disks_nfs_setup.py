@@ -3,8 +3,8 @@ This script will do the following:
 
 1) download and install NFS drivers for the specific kernel version.
 2) activate NFS drivers
-3) update read-ahead cache automatically to 16MB, and update ring buffer recommended settings
-4) apply network configuration optimizations
+3) if "--apply-read-ahead-cache" is set, update read-ahead cache to 16MB, and update ring buffer recommended settings
+4) if "--apply-network-optimizations" is set, apply network configuration optimizations
 
 If you have any questions, don't hesitate to reach out to Crusoe support.
 
@@ -12,8 +12,10 @@ If you have any questions, don't hesitate to reach out to Crusoe support.
 import subprocess
 import argparse
 import sys
+import platform
 
 NFS_PACKAGE_URL = "https://github.com/crusoecloud/crusoe-nfs-support/raw/refs/heads/main/vastnfs-dkms_4.0.35-vastdata_all.deb"
+NFS_PACKAGE_URL_KERNEL_68_PLUS = "https://github.com/crusoecloud/crusoe-nfs-support/raw/refs/heads/main/vastnfs-dkms_4.5.1-vastdata_all.deb"
 
 def run_command(command, timeout=5):
     try:
@@ -26,6 +28,24 @@ def run_command(command, timeout=5):
         return None, e
     except Exception as e:
         return None, e.stderr
+def is_kernel_at_least(target_version):
+    """
+    returns True if current kernel is >= target_version
+    """
+    raw_version = platform.release()    
+    cleaned_version = raw_version.split('-')[0].split('+')[0]
+    
+    def parse(v):
+        return tuple(map(int, v.split('.')))
+
+    try:
+        current_tuple = parse(cleaned_version)
+        target_tuple = parse(target_version)
+        
+        return current_tuple >= target_tuple, None
+        
+    except ValueError:
+        return False, f"could not parse kernel version {raw_version}"
 def manually_install_VAST_NFS_driver(auto_confirm = False):
     if not auto_confirm:
         key_press = input(f"IMPORTANT: The NFS driver will be installed. \n\tThis requires installing a few packages (dkms nfs-common).\n\tContinue? (y/N) ")
@@ -34,7 +54,10 @@ def manually_install_VAST_NFS_driver(auto_confirm = False):
             return ""
     
     print("Downloading NFS driver debian package...")
-    _, err = run_command(f"cd /tmp && wget -O /tmp/crusoe_nfs.deb {NFS_PACKAGE_URL}", 300)
+    kernel_68, err = is_kernel_at_least("6.8")
+    if err:
+        print(f"WARNING: something went wrong when checking the kernel version (falling back to default package; please report this to support): {err}")
+    _, err = run_command(f"cd /tmp && wget -O /tmp/crusoe_nfs.deb {NFS_PACKAGE_URL_KERNEL_68_PLUS if kernel_68 else NFS_PACKAGE_URL}", 300)
     if err:
         print(f"ERROR: something went wrong when downloading the driver: {err}")
         return err
