@@ -1,3 +1,0 @@
-HOST                           COUNT  READ   WRITE  MOUNT_POINTS
-----                           -----  ----   -----  ------------
-ubuntu@160.211.64.125          1      1      1      /home/ubuntu/hello(RW)
