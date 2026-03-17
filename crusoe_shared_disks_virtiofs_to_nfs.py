@@ -168,7 +168,7 @@ def remount_fstab_mounts(name_to_id, auto_confirm):
                 print(f"Error: cannot find volume ID for {disk_name}")
                 continue
 
-            new_lines[i] = f"{start_ip}:/volumes/{name_to_id[disk_name]} {mount_dir} nfs vers=3,nconnect=16,spread_reads,spread_writes,remoteports={start_ip}-{end_ip} 0 0"    
+            new_lines[i] = f"{start_ip}:/volumes/{name_to_id[disk_name]} {mount_dir} nfs vers=3,nconnect=16,spread_reads,spread_writes,remoteports={start_ip}-{end_ip},_netdev,nofail,x-systemd.automount,x-systemd.idle-timeout=30 0 0"    
     if virtiofs_mount_count == 0:
         print("There are no fstab mounts to convert from virtiofs to NFS.")
         return
