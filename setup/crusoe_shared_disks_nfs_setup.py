@@ -14,8 +14,8 @@ import argparse
 import sys
 import platform
 
-NFS_PACKAGE_URL = "https://github.com/crusoecloud/crusoe-nfs-support/raw/refs/heads/main/vastnfs-dkms_4.0.35-vastdata_all.deb"
-NFS_PACKAGE_URL_KERNEL_68_PLUS = "https://github.com/crusoecloud/crusoe-nfs-support/raw/refs/heads/main/vastnfs-dkms_4.5.1-vastdata_all.deb"
+NFS_PACKAGE_URL = "https://github.com/crusoecloud/crusoe-nfs-support/raw/refs/heads/main/debs/vastnfs-dkms_4.0.35-vastdata_all.deb"
+NFS_PACKAGE_URL_KERNEL_68_PLUS = "https://github.com/crusoecloud/crusoe-nfs-support/raw/refs/heads/main/debs/vastnfs-dkms_4.5.1-vastdata_all.deb"
 
 def run_command(command, timeout=5):
     try:

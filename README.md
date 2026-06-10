@@ -1,78 +1,28 @@
 # crusoe-nfs-support
 
-This repository hosts scripts by the Crusoe Cloud team to assist with the Shared Disk NFS migration process.
+Scripts and driver packages from the Crusoe Cloud team for using [Shared Disks](https://docs.crusoecloud.com/storage/disks/managing-shared-disks) over NFS.
 
-## How to install NFS drivers for Crusoe Shared Disks
+## Repository layout
 
-To apply this script to multiple VMs at once, it is recommended to use the `pssh` and `pscp` helper programs:
+| Directory | Contents |
+|---|---|
+| [`setup/`](setup/) | NFS driver installer for VMs that mount Shared Disks |
+| [`support/`](support/) | Diagnostic and verification scripts for troubleshooting NFS clients |
+| [`debs/`](debs/) | VAST NFS dkms driver packages (downloaded automatically by the setup script) |
+| [`archive/`](archive/) | Legacy migration scripts |
+
+## Quick start
 
 > [!IMPORTANT]
 > Installing the Crusoe NFS drivers can disrupt existing NFS mounts on your VM. If applicable, please stop any active workflows before proceeding.
 
-1. Locally, download the `crusoe_shared_disks_nfs_setup.py` script to a file:
+On the VM:
 
 ```
-wget -O crusoe_shared_disks_nfs_setup.py https://github.com/crusoecloud/crusoe-nfs-support/raw/refs/heads/main/crusoe_shared_disks_nfs_setup.py
+wget -O crusoe_shared_disks_nfs_setup.py https://github.com/crusoecloud/crusoe-nfs-support/raw/refs/heads/main/setup/crusoe_shared_disks_nfs_setup.py
+python3 crusoe_shared_disks_nfs_setup.py --apply-read-ahead-cache --apply-network-optimizations
 ```
 
-2. Create a file, named hosts.txt, that includes the IP addresses, line-by-line, of the VMs to apply this script to. For example, it may look something like this:
+To install across multiple VMs at once, see [`setup/README.md`](setup/README.md).
 
-```
-touch hosts.txt
-echo "ubuntu@1.2.3.4" >> hosts.txt
-echo "ubuntu@1.2.3.5" >> hosts.txt
-```
-
-3a. Use pscp and pssh to apply the script to multiple files at once. Note that the setup script can take a long time (more than a few minutes).
-
-```
-pscp -h hosts.txt crusoe_shared_disks_nfs_setup.py /home/ubuntu/crusoe_shared_disks_nfs_setup.py
-pssh -t 0 -h hosts.txt "export DEBIAN_FRONTEND=noninteractive && python3 /home/ubuntu/crusoe_shared_disks_nfs_setup.py -y"
-```
-
-3b. By default, the read-ahead cache optimizations and network optimizations are turned off. This can be switched on using a command like so:
-
-```
-pscp -h hosts.txt crusoe_shared_disks_nfs_setup.py /home/ubuntu/crusoe_shared_disks_nfs_setup.py
-pssh -t 0 -h hosts.txt "export DEBIAN_FRONTEND=noninteractive && python3 /home/ubuntu/crusoe_shared_disks_nfs_setup.py -y --apply-read-ahead-cache --apply-network-optimizations"
-```
-
-## How to remount Virtiofs to NFS for Crusoe Shared Disks
-
-**You should only use the remount script when you are not actively using any of your existing shared volume mounts.**
-
-To apply this script to multiple VMs at once, it is recommended to use the `pssh` and `pscp` helper programs:
-
-> [!IMPORTANT]
-> The remount script WILL interrupt existing Virtiofs mounts on your VM. Please stop any active workflows before proceeding.
-
-1. Locally, download the `crusoe_shared_disks_virtiofs_to_nfs.py` script to a file:
-
-```
-wget -O crusoe_shared_disks_virtiofs_to_nfs.py https://github.com/crusoecloud/crusoe-nfs-support/raw/refs/heads/main/crusoe_shared_disks_virtiofs_to_nfs.py
-```
-
-2. Obtain the list of disk names to disk IDs for your project. You will need your project's ID and the Crusoe CLI to run this command. If you are having troubles running this command, reach out to Crusoe support. The command is as follows:
-
-```
-crusoe storage disks list --project-id <PROJECT_ID> --format json | jq -r '[.[] | select(.type == "shared-volume")] | map("\(.name),\(.id)") | join("+")'
-```
-
-The output should look similar to this: `disk-name-1,00000000-0000-0000-0000-000000000000+disk-name-2,00000000-0000-0000-0000-000000000000`
-
-Copy this to the `<PASTE_DISK_TEXT_HERE>` section of the command in step (4).
-
-3. Create a file, named hosts.txt, that includes the IP addresses, line-by-line, of the VMs to apply this script to. For example, it may look something like this:
-
-```
-touch hosts.txt
-echo "ubuntu@1.2.3.4" >> hosts.txt
-echo "ubuntu@1.2.3.5" >> hosts.txt
-```
-
-4. Use pscp and pssh to apply the script to multiple files at once. Please replace `<PASTE_DISK_TEXT_HERE>` with the data found in step (2). Note that the setup script can take a long time (more than a few minutes).
-
-```
-pscp -h hosts.txt crusoe_shared_disks_virtiofs_to_nfs.py /home/ubuntu/crusoe_shared_disks_virtiofs_to_nfs.py
-pssh -t 0 -h hosts.txt "export DEBIAN_FRONTEND=noninteractive && python3 /home/ubuntu/crusoe_shared_disks_virtiofs_to_nfs.py -y --name-ids <PASTE_DISK_TEXT_HERE>"
-```
+For full documentation, see [Setting up the VAST NFS driver](https://docs.crusoecloud.com/storage/disks/setup-nfs-driver) on the Crusoe Cloud docs site.
